@@ -1,0 +1,22 @@
+Bootstrap: docker
+From: pytorch/pytorch:1.1.0-cuda10.0-cudnn7.5-devel
+
+%help
+This is the mmdetection singularity container.  
+
+%post
+
+apt-get update && apt-get install -y libglib2.0-0 libsm6 libxrender-dev libxext6
+
+# Install mmdetection
+export PATH=$PATH:/opt/conda/bin
+conda install cython -y
+git clone https://github.com/ash1995/mmdetection.git /mmdetection
+cd /mmdetection
+pip install -e .
+#%runscript
+#cd /mmdetection
+#exec /bin/bash "$@"
+#%startscript
+#cd /mmdetection
+#exec /bin/bash "$@"
