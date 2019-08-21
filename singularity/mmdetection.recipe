@@ -14,9 +14,11 @@ conda install cython -y
 git clone https://github.com/ash1995/mmdetection.git /mmdetection
 cd /mmdetection
 pip install -e .
-#%runscript
-#cd /mmdetection
-#exec /bin/bash "$@"
-#%startscript
-#cd /mmdetection
-#exec /bin/bash "$@"
+
+%runscript
+cd /mmdetection
+exec /bin/bash "$@"
+
+%startscript
+cd /mmdetection
+exec /bin/bash "$@"
