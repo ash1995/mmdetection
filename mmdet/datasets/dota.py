@@ -1,11 +1,5 @@
-import numpy as np
-from pycocotools.coco import COCO
-
-from .custom import CustomDataset
 from .registry import DATASETS
-
-from coco import CocoDataset
-
+from .coco import CocoDataset
 
 @DATASETS.register_module
 class DotaDataset(CocoDataset):
