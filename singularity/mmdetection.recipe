@@ -13,7 +13,7 @@ apt-get update && apt-get install -y libglib2.0-0 libsm6 libxrender-dev libxext6
 # Install mmdetection
 export PATH=$PATH:/opt/conda/bin
 conda install cython -y
-git clone https://github.com/ash1995/mmdetection.git /mmdetection
+git clone https://github.com/ashnair1/mmdetection.git /mmdetection
 cd /mmdetection
 pip install --no-cache-dir -e .
 
