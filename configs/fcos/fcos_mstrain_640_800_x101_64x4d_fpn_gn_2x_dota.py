@@ -22,7 +22,7 @@ model = dict(
         relu_before_extra_convs=True),
     bbox_head=dict(
         type='FCOSHead',
-        num_classes=81,
+        num_classes=16,
         in_channels=256,
         stacked_convs=4,
         feat_channels=256,
@@ -130,6 +130,7 @@ log_config = dict(
     ])
 # yapf:enable
 # runtime settings
+evaluation = dict(interval=4)
 total_epochs = 24
 device_ids = range(8)
 dist_params = dict(backend='nccl')
