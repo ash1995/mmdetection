@@ -1,0 +1,25 @@
+ARG CUDA = "10.0"
+ARG CUDNN = "7"
+FROM nvidia/cuda:${CUDA}-cudnn${CUDNN}-devel-ubuntu16.04
+
+RUN apt-get update && apt-get install -y libglib2.0-0 libsm6 libxrender-dev libxext6 vim git curl \
+&& apt-get clean \
+&& rm -rf /var/lib/apt/lists/*
+
+RUN curl -so /home/ashwin/miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-4.5.11-Linux-x86_64.sh \
+chmod +x /home/miniconda.sh \
+&& /home/miniconda.sh -b -p /home/miniconda \
+&& rm ~/miniconda.sh
+
+export PATH=$PATH:/home/miniconda/bin/
+export ENV CONDA_AUTO_UPDATE_CONDA=false
+
+# CUDA 10.0-specific steps
+RUN conda install -y pytorch torchvision cudatoolkit=10.0 -c pytorch \
+&& conda clean -ya
+
+# Install mmdetection
+RUN conda install cython -y
+RUN git clone https://github.com/ash1995/mmdetection.git /mmdetection
+WORKDIR /mmdetection
+RUN pip install --no-cache-dir -e .
