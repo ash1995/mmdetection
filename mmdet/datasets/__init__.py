@@ -14,5 +14,5 @@ __all__ = [
     'CustomDataset', 'XMLDataset', 'CocoDataset', 'VOCDataset',
     'CityscapesDataset', 'GroupSampler', 'DistributedGroupSampler',
     'build_dataloader', 'ConcatDataset', 'RepeatDataset', 'ExtraAugmentation',
-    'WIDERFaceDataset', 'DATASETS', 'build_dataset'
+    'WIDERFaceDataset', 'DATASETS', 'build_dataset', 'DotaDataset'
 ]
