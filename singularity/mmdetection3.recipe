@@ -1,0 +1,42 @@
+Bootstrap: docker
+From: nvidia/cuda:10.0-cudnn7-devel-ubuntu16.04
+
+%files
+/home/ashwin/miniconda.sh /home
+
+%help
+This is the mmdetection singularity container.  
+
+%post
+
+apt-get update && apt-get install -y libglib2.0-0 libsm6 libxrender-dev libxext6 vim git curl \
+&& apt-get clean \
+&& rm -rf /var/lib/apt/lists/*
+
+#curl -so /home/ashwin/miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-4.5.11-Linux-x86_64.sh \
+chmod +x /home/miniconda.sh \
+&& /home/miniconda.sh -b -p /home/miniconda \
+#&& rm ~/miniconda.sh
+
+export PATH=$PATH:/home/miniconda/bin/
+export ENV CONDA_AUTO_UPDATE_CONDA=false
+
+# CUDA 10.0-specific steps
+conda install -y pytorch torchvision cudatoolkit=10.0 -c pytorch \
+&& conda clean -ya
+
+
+# Install mmdetection
+#export PATH=$PATH:/opt/conda/bin
+conda install cython -y
+git clone https://github.com/ash1995/mmdetection.git /mmdetection
+cd /mmdetection
+pip install --no-cache-dir -e .
+
+%runscript
+cd /mmdetection
+exec /bin/bash "$@"
+
+%startscript
+cd /mmdetection
+exec /bin/bash "$@"

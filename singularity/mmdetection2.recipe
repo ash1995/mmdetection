@@ -1,0 +1,39 @@
+Bootstrap: docker
+From: nvcr.io/nvidia/pytorch:19.02-py3
+
+%help
+This is the mmdetection singularity container.  
+
+%post
+
+apt-get update && apt-get install -y libglib2.0-0 libsm6 libxrender-dev libxext6 vim \
+&& apt-get clean 
+
+export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/cuda/lib64/stubs
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        cuda-nvml-dev-$CUDA_PKG_VERSION \
+        cuda-command-line-tools-$CUDA_PKG_VERSION \
+cuda-libraries-dev-$CUDA_PKG_VERSION \
+        cuda-minimal-build-$CUDA_PKG_VERSION \
+        libnccl-dev=$NCCL_VERSION-1+cuda10.1 \
+&& \
+    rm -rf /var/lib/apt/lists/*
+
+
+#&& rm -rf /var/lib/apt/lists/*
+
+# Install mmdetection
+export PATH=$PATH:/opt/conda/bin
+conda install cython -y
+git clone https://github.com/ash1995/mmdetection.git /mmdetection
+cd /mmdetection
+#pip install --no-cache-dir -e .
+
+%runscript
+cd /mmdetection
+exec /bin/bash "$@"
+
+%startscript
+cd /mmdetection
+exec /bin/bash "$@"

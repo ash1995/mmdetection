@@ -1,0 +1,15 @@
+bind: Address already in use
+channel_setup_fwd_listener_tcpip: cannot listen to port: 8889
+Could not request local forwarding.
+[I 05:30:45.403 NotebookApp] The port 8889 is already in use, trying another port.
+[I 05:30:45.581 NotebookApp] JupyterLab extension loaded from /home/an1/miniconda3/envs/dlenv/lib/python3.6/site-packages/jupyterlab
+[I 05:30:45.581 NotebookApp] JupyterLab application directory is /home/an1/miniconda3/envs/dlenv/share/jupyter/lab
+[I 05:30:45.584 NotebookApp] Serving notebooks from local directory: /home/an1
+[I 05:30:45.584 NotebookApp] The Jupyter Notebook is running at:
+[I 05:30:45.584 NotebookApp] http://localhost:8890/?token=6ade5fb69c744fc99f2332a253e5f93ff46a0e2f58d3de33
+[I 05:30:45.584 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[C 05:30:45.584 NotebookApp] 
+    
+    Copy/paste this URL into your browser when you connect for the first time,
+    to login with a token:
+        http://localhost:8890/?token=6ade5fb69c744fc99f2332a253e5f93ff46a0e2f58d3de33
