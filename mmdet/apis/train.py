@@ -35,12 +35,22 @@ def parse_losses(losses):
 
 
 def batch_processor(model, data, train_mode):
+    if 'img1'in list(data.keys()) and 'img2' in list(data.keys()):
+        data['img'] = [data['img1'], data['img2']]
+        del data['img1']
+        del data['img2']
+
     losses = model(**data)
     loss, log_vars = parse_losses(losses)
 
-    outputs = dict(
-        loss=loss, log_vars=log_vars, num_samples=len(data['img'].data))
-
+    if 'img' in list(data.keys()):
+        # Single input
+        outputs = dict(loss=loss, log_vars=log_vars,
+                       num_samples=len(data['img'][0].data))
+    else:
+        # Pair of inputs
+        outputs = dict(loss=loss, log_vars=log_vars,
+                       num_samples=len(data['img1'].data))
     return outputs
 
 
