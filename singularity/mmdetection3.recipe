@@ -29,7 +29,7 @@ conda install -y pytorch torchvision cudatoolkit=10.0 -c pytorch \
 # Install mmdetection
 #export PATH=$PATH:/opt/conda/bin
 conda install cython -y
-git clone https://github.com/ash1995/mmdetection.git /mmdetection
+git clone https://github.com/ashnair1/mmdetection.git /mmdetection
 cd /mmdetection
 pip install --no-cache-dir -e .
 
