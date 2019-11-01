@@ -2,6 +2,7 @@ from .builder import build_dataset
 from .cityscapes import CityscapesDataset
 from .coco import CocoDataset
 from .dota import DotaDataset
+from .xview2 import Xview2Dataset
 from .custom import CustomDataset
 from .dataset_wrappers import ConcatDataset, RepeatDataset
 from .loader import DistributedGroupSampler, GroupSampler, build_dataloader

@@ -1,6 +1,6 @@
 # model settings
 model = dict(
-    type='MaskScoringRCNN',
+    type='SiameseMaskScoringRCNN',
     pretrained='open-mmlab://resnext101_64x4d',
     backbone=dict(
         type='ResNeXt',
@@ -125,18 +125,18 @@ test_cfg = dict(
         mask_thr_binary=0.5))
 # dataset settings
 dataset_type = 'Xview2Dataset'
-data_root = '/home/an1/Datasets/xView2/'
+data_root = '/home/ashwin/Desktop/Projects/Datasets/xView2/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
-    dict(type='LoadImageFromFile'),
+    dict(type='LoadImagePairFromFile'),
     dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
-    dict(type='Resize', img_scale=(1333, 800), keep_ratio=True),
-    dict(type='RandomFlip', flip_ratio=0.5),
-    dict(type='Normalize', **img_norm_cfg),
-    dict(type='Pad', size_divisor=32),
+    dict(type='Resize', img_scale=(1333, 800), keep_ratio=True, pair=True),
+    dict(type='RandomFlip', flip_ratio=0.5, pair=True),
+    dict(type='Normalize', **img_norm_cfg, pair=True),
+    dict(type='Pad', size_divisor=32, pair=True),
     dict(type='DefaultFormatBundle'),
-    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels', 'gt_masks']),
+    dict(type='Collect', keys=['img1', 'img2', 'gt_bboxes', 'gt_labels', 'gt_masks'], pair=True),
 ]
 test_pipeline = [
     dict(type='LoadImageFromFile'),
@@ -149,13 +149,13 @@ test_pipeline = [
             dict(type='RandomFlip'),
             dict(type='Normalize', **img_norm_cfg),
             dict(type='Pad', size_divisor=32),
-            dict(type='ImageToTensor', keys=['img']),
-            dict(type='Collect', keys=['img']),
+            dict(type='ImageToTensor', keys=['img1', 'img2']),
+            dict(type='Collect', keys=['img1', 'img2']),
         ])
 ]
 data = dict(
     imgs_per_gpu=2,
-    workers_per_gpu=2,
+    workers_per_gpu=1,
     train=dict(
         type=dataset_type,
         ann_file=data_root + 'annotations/train.json',

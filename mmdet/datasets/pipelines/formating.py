@@ -115,8 +115,15 @@ class DefaultFormatBundle(object):
 
     def __call__(self, results):
         if 'img' in results:
+            # Single Image
             img = np.ascontiguousarray(results['img'].transpose(2, 0, 1))
             results['img'] = DC(to_tensor(img), stack=True)
+        if 'img1' in results:
+            # Image Pair
+            img1 = np.ascontiguousarray(results['img1'].transpose(2, 0, 1))
+            img2 = np.ascontiguousarray(results['img2'].transpose(2, 0, 1))
+            results['img1'] = DC(to_tensor(img1), stack=True)
+            results['img2'] = DC(to_tensor(img2), stack=True)
         for key in ['proposals', 'gt_bboxes', 'gt_bboxes_ignore', 'gt_labels']:
             if key not in results:
                 continue
@@ -166,10 +173,13 @@ class Collect(object):
 
     def __init__(self,
                  keys,
-                 meta_keys=('filename', 'ori_shape', 'img_shape', 'pad_shape',
-                            'scale_factor', 'flip', 'img_norm_cfg')):
+                 meta_keys=['filename', 'ori_shape', 'img_shape', 'pad_shape',
+                            'scale_factor', 'flip', 'img_norm_cfg'], pair=False):
         self.keys = keys
         self.meta_keys = meta_keys
+        if pair is True:
+            self.meta_keys.extend(['pre_filename', 'post_filename'])
+            self.meta_keys.remove('filename')
 
     def __call__(self, results):
         data = {}

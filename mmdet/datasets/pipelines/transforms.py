@@ -41,7 +41,8 @@ class Resize(object):
                  img_scale=None,
                  multiscale_mode='range',
                  ratio_range=None,
-                 keep_ratio=True):
+                 keep_ratio=True,
+                 pair=False):
         if img_scale is None:
             self.img_scale = None
         else:
@@ -61,6 +62,7 @@ class Resize(object):
         self.multiscale_mode = multiscale_mode
         self.ratio_range = ratio_range
         self.keep_ratio = keep_ratio
+        self.pair = pair
 
     @staticmethod
     def random_select(img_scales):
@@ -110,16 +112,37 @@ class Resize(object):
 
     def _resize_img(self, results):
         if self.keep_ratio:
-            img, scale_factor = mmcv.imrescale(
-                results['img'], results['scale'], return_scale=True)
+            if self.pair is False:
+                img, scale_factor = mmcv.imrescale(
+                    results['img'], results['scale'], return_scale=True)
+            else:
+                img1, scale_factor = mmcv.imrescale(
+                    results['img1'], results['scale'], return_scale=True)
+                img2, scale_factor = mmcv.imrescale(
+                    results['img2'], results['scale'], return_scale=True)
+
         else:
-            img, w_scale, h_scale = mmcv.imresize(
-                results['img'], results['scale'], return_scale=True)
+            if self.pair is False:
+                img, w_scale, h_scale = mmcv.imresize(
+                    results['img'], results['scale'], return_scale=True)
+            else:
+                img1, w_scale, h_scale = mmcv.imresize(
+                    results['img1'], results['scale'], return_scale=True)
+                img2, w_scale, h_scale = mmcv.imresize(
+                    results['img2'], results['scale'], return_scale=True)
             scale_factor = np.array([w_scale, h_scale, w_scale, h_scale],
                                     dtype=np.float32)
-        results['img'] = img
-        results['img_shape'] = img.shape
-        results['pad_shape'] = img.shape  # in case that there is no padding
+
+        if self.pair is False:
+            results['img'] = img
+            results['img_shape'] = img.shape
+            results['pad_shape'] = img.shape  # in case that there is no padding
+        else:
+            results['img1'] = img1
+            results['img2'] = img2
+            results['img_shape'] = img1.shape
+            results['pad_shape'] = img1.shape  # in case that there is no padding
+
         results['scale_factor'] = scale_factor
         results['keep_ratio'] = self.keep_ratio
 
@@ -179,8 +202,9 @@ class RandomFlip(object):
         flip_ratio (float, optional): The flipping probability.
     """
 
-    def __init__(self, flip_ratio=None):
+    def __init__(self, flip_ratio=None, pair=False):
         self.flip_ratio = flip_ratio
+        self.pair = pair
         if flip_ratio is not None:
             assert flip_ratio >= 0 and flip_ratio <= 1
 
@@ -203,8 +227,14 @@ class RandomFlip(object):
             flip = True if np.random.rand() < self.flip_ratio else False
             results['flip'] = flip
         if results['flip']:
-            # flip image
-            results['img'] = mmcv.imflip(results['img'])
+            if self.pair is False:
+                # flip image
+                results['img'] = mmcv.imflip(results['img'])
+            else:
+                # flip image
+                results['img1'] = mmcv.imflip(results['img1'])
+                results['img2'] = mmcv.imflip(results['img2'])
+
             # flip bboxes
             for key in results.get('bbox_fields', []):
                 results[key] = self.bbox_flip(results[key],
@@ -232,22 +262,37 @@ class Pad(object):
         pad_val (float, optional): Padding value, 0 by default.
     """
 
-    def __init__(self, size=None, size_divisor=None, pad_val=0):
+    def __init__(self, size=None, size_divisor=None, pad_val=0, pair=False):
         self.size = size
         self.size_divisor = size_divisor
         self.pad_val = pad_val
+        self.pair = pair
         # only one of size and size_divisor should be valid
         assert size is not None or size_divisor is not None
         assert size is None or size_divisor is None
 
     def _pad_img(self, results):
-        if self.size is not None:
-            padded_img = mmcv.impad(results['img'], self.size)
-        elif self.size_divisor is not None:
-            padded_img = mmcv.impad_to_multiple(
-                results['img'], self.size_divisor, pad_val=self.pad_val)
-        results['img'] = padded_img
-        results['pad_shape'] = padded_img.shape
+        if self.pair is False:
+            if self.size is not None:
+                padded_img = mmcv.impad(results['img'], self.size)
+            elif self.size_divisor is not None:
+                padded_img = mmcv.impad_to_multiple(results['img'],
+                                                    self.size_divisor, pad_val=self.pad_val)
+            results['img'] = padded_img
+            results['pad_shape'] = padded_img.shape
+        else:
+            if self.size is not None:
+                padded_img1 = mmcv.impad(results['img1'], self.size)
+                padded_img2 = mmcv.impad(results['img2'], self.size)
+            elif self.size_divisor is not None:
+                padded_img1 = mmcv.impad_to_multiple(results['img1'],
+                                                    self.size_divisor, pad_val=self.pad_val)
+                padded_img2 = mmcv.impad_to_multiple(results['img2'],
+                                                    self.size_divisor, pad_val=self.pad_val)
+            results['img1'] = padded_img1
+            results['img2'] = padded_img2
+            results['pad_shape'] = padded_img1.shape
+
         results['pad_fixed_size'] = self.size
         results['pad_size_divisor'] = self.size_divisor
 
@@ -283,14 +328,21 @@ class Normalize(object):
             default is true.
     """
 
-    def __init__(self, mean, std, to_rgb=True):
+    def __init__(self, mean, std, to_rgb=True, pair=False):
         self.mean = np.array(mean, dtype=np.float32)
         self.std = np.array(std, dtype=np.float32)
         self.to_rgb = to_rgb
+        self.pair = pair
 
     def __call__(self, results):
-        results['img'] = mmcv.imnormalize(results['img'], self.mean, self.std,
-                                          self.to_rgb)
+        if self.pair is False:
+            results['img'] = mmcv.imnormalize(results['img'], self.mean, self.std,
+                                              self.to_rgb)
+        else:
+            results['img1'] = mmcv.imnormalize(results['img1'], self.mean, self.std,
+                                               self.to_rgb)
+            results['img2'] = mmcv.imnormalize(results['img2'], self.mean, self.std,
+                                               self.to_rgb)
         results['img_norm_cfg'] = dict(
             mean=self.mean, std=self.std, to_rgb=self.to_rgb)
         return results

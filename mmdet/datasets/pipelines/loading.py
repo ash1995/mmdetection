@@ -35,6 +35,43 @@ class LoadImageFromFile(object):
 
 
 @PIPELINES.register_module
+class LoadImagePairFromFile(object):
+
+    def __init__(self, to_float32=False):
+        self.to_float32 = to_float32
+
+    def __call__(self, results):
+        if results['img_prefix'] is not None:
+            print(results['img_prefix'])
+            # TODO: Remove hardcoded folder names (pre, post)
+            filename1 = osp.join(results['img_prefix'], 'pre',
+                                 results['img_info']['pre_filename'])
+            filename2 = osp.join(results['img_prefix'], 'post',
+                                 results['img_info']['post_filename'])
+        else:
+            filename1 = results['img_info']['pre_filename']
+            filename2 = results['img_info']['post_filename']
+        img1 = mmcv.imread(filename1)
+        img2 = mmcv.imread(filename2)
+
+        if self.to_float32:
+            img1 = img1.astype(np.float32)
+            img2 = img2.astype(np.float32)
+        results['pre_filename'] = filename1
+        results['post_filename'] = filename2
+        results['img1'] = img1
+        results['img2'] = img2
+        results['img_shape'] = img1.shape
+        results['ori_shape'] = img1.shape
+        assert img1.shape == img2.shape
+        return results
+
+    def __repr__(self):
+        return self.__class__.__name__ + '(to_float32={})'.format(
+            self.to_float32)
+
+
+@PIPELINES.register_module
 class LoadAnnotations(object):
 
     def __init__(self,
