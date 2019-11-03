@@ -42,7 +42,6 @@ class LoadImagePairFromFile(object):
 
     def __call__(self, results):
         if results['img_prefix'] is not None:
-            print(results['img_prefix'])
             # TODO: Remove hardcoded folder names (pre, post)
             filename1 = osp.join(results['img_prefix'], 'pre',
                                  results['img_info']['pre_filename'])

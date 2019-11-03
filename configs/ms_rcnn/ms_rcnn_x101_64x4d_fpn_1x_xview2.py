@@ -125,7 +125,7 @@ test_cfg = dict(
         mask_thr_binary=0.5))
 # dataset settings
 dataset_type = 'Xview2Dataset'
-data_root = '/home/ashwin/Desktop/Projects/Datasets/xView2/'
+data_root = '/home/an1/Datasets/xView2/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
@@ -139,18 +139,18 @@ train_pipeline = [
     dict(type='Collect', keys=['img1', 'img2', 'gt_bboxes', 'gt_labels', 'gt_masks'], pair=True),
 ]
 test_pipeline = [
-    dict(type='LoadImageFromFile'),
+    dict(type='LoadImagePairFromFile'),
     dict(
         type='MultiScaleFlipAug',
         img_scale=(1333, 800),
         flip=False,
         transforms=[
-            dict(type='Resize', keep_ratio=True),
-            dict(type='RandomFlip'),
-            dict(type='Normalize', **img_norm_cfg),
-            dict(type='Pad', size_divisor=32),
+            dict(type='Resize', img_scale=(1333, 800), keep_ratio=True, pair=True),
+            dict(type='RandomFlip', flip_ratio=0.5, pair=True),
+            dict(type='Normalize', **img_norm_cfg, pair=True),
+            dict(type='Pad', size_divisor=32, pair=True),
             dict(type='ImageToTensor', keys=['img1', 'img2']),
-            dict(type='Collect', keys=['img1', 'img2']),
+            dict(type='Collect', keys=['img1', 'img2'], pair=True),
         ])
 ]
 data = dict(
