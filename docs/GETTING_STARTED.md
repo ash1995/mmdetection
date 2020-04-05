@@ -74,7 +74,7 @@ You will get two json files `mask_rcnn_test-dev_results.bbox.json` and `mask_rcn
 ```shell
 ./tools/dist_test.sh configs/cityscapes/mask_rcnn_r50_fpn_1x_cityscapes.py \
     checkpoints/mask_rcnn_r50_fpn_1x_cityscapes_20200227-afe51d5a.pth \
-    8  --format_only --options "outfile_prefix=./mask_rcnn_cityscapes_test_results"
+    8  --format_only --options "txtfile_prefix=./mask_rcnn_cityscapes_test_results"
 ```
 
 The generated png and txt would be under `./mask_rcnn_cityscapes_test_results` directory.
@@ -188,7 +188,7 @@ According to the [Linear Scaling Rule](https://arxiv.org/abs/1706.02677), you ne
 ### Train with a single GPU
 
 ```shell
-python tools/train.py ${CONFIG_FILE}
+python tools/train.py ${CONFIG_FILE} [optional arguments]
 ```
 
 If you want to specify the working directory in the command, you can add an argument `--work_dir ${YOUR_WORK_DIR}`.
